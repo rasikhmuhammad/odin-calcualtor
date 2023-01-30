@@ -56,7 +56,7 @@ const clearDisplay = function() {
     display.classList.remove("error");
     reset();    
     display.textContent = "0";
-    history.textContent = "0";
+    history.textContent = "";
     if(isError === true) {
         keys.forEach(button => button.removeAttribute('disabled'));
     }
