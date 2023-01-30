@@ -177,14 +177,16 @@ function calculate() {
 
             //result being 0 indicates an error thrown
             if(result !==0) {
-                operand1 = result;
+                operand1 = result.toString();
+            }
+
+            //disable decimal point if answer has decimal key
+            if(operand1.includes(".")) {
+                decimalActive = true;
+                decimalKey.setAttribute('disabled', 'true');
             }
             operator = "";
             operand2 = "";
-
-            //enable decimal point when equal to is clicked
-            decimalActive = false;
-            decimalKey.removeAttribute('disabled');
         } else {
             displayError("Wrong inputs! clear and try again");
         }
@@ -204,7 +206,6 @@ function calculate() {
                 operand1 = "0"
                 updateDisplay(operand1);
             } 
-            console.log(operand1);
             //enable decimal point if it has been erased due to backspace
             if(!operand1.includes(".")) {
                 decimalActive = false;
@@ -234,19 +235,26 @@ function calculate() {
     //decimal point input functionality
     decimalKey.addEventListener('click', (e) => {
         if(operator === "" && operand2 === "") {
-            if(operand1.includes(".")) {
-                e.target.setAttribute('disabled', 'true');
+            if(operand1.includes(".") === false) {
+                operand1 += ".";
+                updateDisplay(operand1);
                 decimalActive = true;
-            }  
+                e.target.setAttribute('disabled', 'true');
+            }
+
+            console.log(operand1.includes("."));
         }
 
         else if(operator !== "") {
-            if(operand2.includes(".")) {
-                e.target.setAttribute('disabled', 'true');
+            if(operand2.includes(".") === false) {
+                operand2 += ".";
+                updateDisplay(operand2);
                 decimalActive = true;
+                e.target.setAttribute('disabled', 'true');
             }
         }
     });
     }
 
+    
 calculate();
