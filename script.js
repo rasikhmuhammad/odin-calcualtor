@@ -4,6 +4,8 @@ let operand2 = "";
 let operator = "";
 let result = 0;
 let isError = false;
+// record if decimal point is being used
+let decimalActive = false;
 
 //DOM element for calculator display
 const display = document.querySelector('p#ongoing-display');
@@ -23,6 +25,8 @@ const equalKey = document.querySelector("#equal-key");
 const backspace = document.querySelector('#backspace-key');
 //clear key
 const clearKey = document.querySelector("#clear-key");
+//decimal point key
+const decimalKey = document.getElementById('decimal-key');
 
 
 //function to update display
@@ -51,7 +55,7 @@ const displayError = function(error) {
     keys.forEach(button => button.setAttribute('disabled', 'true'));
 }
 
-//function to clear display
+//function to clear display and reset calculator
 const clearDisplay = function() {
     display.classList.remove("error");
     reset();    
@@ -60,6 +64,8 @@ const clearDisplay = function() {
     if(isError === true) {
         keys.forEach(button => button.removeAttribute('disabled'));
     }
+    decimalActive = false;
+    decimalKey.removeAttribute('disabled');
 }
 
 const add = function (a,b) {
@@ -134,6 +140,8 @@ function calculate() {
         }
     }));
 
+
+
     //event listener on operator keys
     operatorKeys.forEach( key => key.addEventListener( 'click',(e) => {
         if (operand1 !== "" && operand2 !== "" && operator !== "") {
@@ -151,7 +159,13 @@ function calculate() {
         } 
         operator = e.target.textContent;
         updateHistory(operand1 + " " + operator);
+
+        //enable decimal point when operator is clicked
+        decimalActive = false;
+        decimalKey.removeAttribute('disabled');
     }));
+
+
 
     //event listener on equal to key
     equalKey.addEventListener('click', (e) => {
@@ -167,36 +181,72 @@ function calculate() {
             }
             operator = "";
             operand2 = "";
+
+            //enable decimal point when equal to is clicked
+            decimalActive = false;
+            decimalKey.removeAttribute('disabled');
         } else {
             displayError("Wrong inputs! clear and try again");
         }
     });
 
+
+
     //event listener on backspace key
     backspace.addEventListener('click', (e) => {
+        //for operand1
         if(operator === "" && operand2 === "") {
-    
+            //if operand1 has more than 1 digit, remove last digit
             if(operand1.length > 1) {
                 operand1 = operand1.slice(0, -1);
                 updateDisplay(operand1);
             } else {
                 operand1 = "0"
                 updateDisplay(operand1);
-            }   
+            } 
+            console.log(operand1);
+            //enable decimal point if it has been erased due to backspace
+            if(!operand1.includes(".")) {
+                decimalActive = false;
+                decimalKey.removeAttribute('disabled');
+            }
         }
 
+        //for operand2
         else if(operator !== "") {
-            if(operand1.length > 1) {
+            if(operand2.length > 1) {
                 operand2 = operand2.slice(0, -1);
                 updateDisplay(operand2);
             } else {
-                operand2 = ""
+                operand2 = "";
                 updateDisplay(operand2);
+            }
+            //enable decimal point if it has been erased due to backspace
+            if(!operand2.includes(".")) {
+                decimalActive = false;
+                decimalKey.removeAttribute('disabled');
+            }
+        }     
+    });
+
+
+
+    //decimal point input functionality
+    decimalKey.addEventListener('click', (e) => {
+        if(operator === "" && operand2 === "") {
+            if(operand1.includes(".")) {
+                e.target.setAttribute('disabled', 'true');
+                decimalActive = true;
+            }  
+        }
+
+        else if(operator !== "") {
+            if(operand2.includes(".")) {
+                e.target.setAttribute('disabled', 'true');
+                decimalActive = true;
             }
         }
     });
-
     }
-
 
 calculate();
