@@ -2,6 +2,7 @@ body {
     text-align: center;
     background-image: url("./media/background.jpg");
     background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .calculator {
@@ -11,6 +12,7 @@ body {
     max-width: 360px;
     min-width: 300px;
     margin: 60px auto;
+    margin-top: 150px;
     box-sizing: border-box;
     box-shadow: 0 0 8px grey;
     backdrop-filter: saturate(180%) blur(40px);
