@@ -9,8 +9,20 @@ let isError = false;
 const display = document.querySelector('p#ongoing-display');
 const history = document.querySelector('p#history');
 
-//nodelist for all keys
+//nodelist for various keys/buttons
+
+//all buttons except clear
 const keys = document.querySelectorAll('button.keys');
+//all keys whose value can be outputted to display
+const inputKeys = document.querySelectorAll(".show-input");
+//only operators keys
+const operatorKeys = document.querySelectorAll(".operator");
+//equal to key for calculating
+const equalKey = document.querySelector("#equal-key");
+//backspace key
+const backspace = document.querySelector('#backspace-key');
+//clear key
+const clearKey = document.querySelector("#clear-key");
 
 
 //function to update display
@@ -104,20 +116,16 @@ function operate(a,b,operator) {
 //main function
 function calculate() {
 
-    const clearKey = document.querySelector("#clear-key");
-    const backSpace = document.querySelector("#backspace-key");
-
     //clear calculator
     clearKey.addEventListener('click', clearDisplay);
 
     //event listener on number keys
-    const inputKeys = document.querySelectorAll(".show-input");
     inputKeys.forEach(key => key.addEventListener('click', (e) => {
         if(operator !== "") {
             operand2 += e.target.textContent;
             updateDisplay(operand2);
         } else {
-            if(operand1 === "0" || operand1 === ""){
+            if(operand1 === "0"){
                 operand1 = e.target.textContent;
             } else {
                 operand1 += e.target.textContent;
@@ -127,7 +135,6 @@ function calculate() {
     }));
 
     //event listener on operator keys
-    const operatorKeys = document.querySelectorAll(".operator");
     operatorKeys.forEach( key => key.addEventListener( 'click',(e) => {
         if (operand1 !== "" && operand2 !== "" && operator !== "") {
             operate(Number(operand1), Number(operand2), operator);
@@ -147,7 +154,6 @@ function calculate() {
     }));
 
     //event listener on equal to key
-    const equalKey = document.querySelector("#equal-key");
     equalKey.addEventListener('click', (e) => {
         if(operand1 !== "" && operand2 !== "" && operator !== "") {
             operate(Number(operand1), Number(operand2), operator);
@@ -161,13 +167,36 @@ function calculate() {
             }
             operator = "";
             operand2 = "";
-        }
-
-        else {
+        } else {
             displayError("Wrong inputs! clear and try again");
         }
     });
-}
+
+    //event listener on backspace key
+    backspace.addEventListener('click', (e) => {
+        if(operator === "" && operand2 === "") {
+    
+            if(operand1.length > 1) {
+                operand1 = operand1.slice(0, -1);
+                updateDisplay(operand1);
+            } else {
+                operand1 = "0"
+                updateDisplay(operand1);
+            }   
+        }
+
+        else if(operator !== "") {
+            if(operand1.length > 1) {
+                operand2 = operand2.slice(0, -1);
+                updateDisplay(operand2);
+            } else {
+                operand2 = ""
+                updateDisplay(operand2);
+            }
+        }
+    });
+
+    }
 
 
 calculate();
