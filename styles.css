@@ -17,7 +17,7 @@ body {
 }
 
 .display {
-    min-height: 150px;
+    min-height: 100px;
     background-color: lightgrey;
     border: 0;
     box-sizing: border-box;
@@ -25,12 +25,21 @@ body {
     border-radius: 0.4rem;
     margin-bottom: 40px;
     box-shadow: 1px 1px 20px lightgray;
-    display: flex;
-    align-items: center;
-    justify-content: end;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 600;
+    text-align: end;
+    padding-top: 10px;
+}
+
+.display p {
+    margin-top: 15px;
+    padding: 0px;
+}
+
+#recurring-display {
+    font-weight: 500;
+    font-size: 1.35rem;
 }
 
 .key-container {
@@ -67,6 +76,7 @@ body {
 
 .calculator button:hover {
     background-color: white;
+    cursor: pointer;
 }
 
 .error {
