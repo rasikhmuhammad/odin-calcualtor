@@ -69,3 +69,8 @@ body {
     background-color: white;
 }
 
+.error {
+    font-weight: 700; 
+    font-size: 1.05rem; 
+    color: red;
+}
