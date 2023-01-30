@@ -2,9 +2,14 @@
 let operand1 = "0";
 let operand2 = "";
 let operator = "";
+let result = 0;
+let isError = false;
 
 //DOM element for calculator display
 const display = document.querySelector('div.display');
+
+//nodelist for all keys
+const keys = document.querySelectorAll('button.keys');
 
 
 //function to update display
@@ -19,20 +24,24 @@ const reset = function () {
     operator = "";
 }
 
-//function to clear display
-const clearDisplay = function() {
-    display.classList.remove("error");
-    reset();
-    display.textContent = "0";
-}
-
-//function to display error message
+//function to display and handle error
 const displayError = function(error) {
     display.textContent = error;
     display.classList.add("error");
     reset();
+    isError = true;
+    keys.forEach(button => button.setAttribute('disabled', 'true'));
 }
 
+//function to clear display
+const clearDisplay = function() {
+    display.classList.remove("error");
+    reset();    
+    display.textContent = "0";
+    if(isError === true) {
+        keys.forEach(button => button.removeAttribute('disabled'));
+    }
+}
 
 const add = function (a,b) {
     return a+b;
@@ -47,11 +56,9 @@ const multiply = function(a,b) {
 }
 
 const divide = function(a,b) {
-    if(b === 0) {
-        displayError("ERROR, cannot divide by 0");
-        return "0";
-    }
-    return a/b;
+    if(b === 0) { 
+        return 0;
+    } else return a/b;
 }
 
 //called if user performs action on two numbers
@@ -60,23 +67,29 @@ function operate(a,b,operator) {
     //check if a and b are numbers
 
     if(typeof(a) !== 'number' && typeof(b) !== "number") {
-         displayError("ERROR, please enter a valid number");
-         return "0";
+         displayError("ERROR, not a valid number, clear and try again!");
     } 
 
     //call the appropriate function based on operator chosen by user
     switch(operator) {
         case '+':
-            return add(a,b);
+            result = add(a,b);
+            updateDisplay(result);
             break;
         case '-':
-            return subtract(a,b);
+            result = subtract(a,b);
+            updateDisplay(result);
             break;
         case 'x':
-            return multiply(a,b);
+            result = multiply(a,b);
+            updateDisplay(result);
             break;
         case "\u00F7":
-            return divide(a,b);
+            result = divide(a,b);
+            if(result === 0) {
+                displayError("ERROR, cannot divide by 0, clear and try again!");
+            }
+            else updateDisplay(result);
             break;
     }
 }
@@ -110,8 +123,10 @@ function calculate() {
     const operatorKeys = document.querySelectorAll(".operator");
     operatorKeys.forEach( key => key.addEventListener( 'click',(e) => {
         if (operand1 !== "" && operand2 !== "" && operator !== "") {
-            operand1 = operate(Number(operand1), Number(operand2), operator);
-            updateDisplay(operand1);
+            operate(Number(operand1), Number(operand2), operator);
+            if(result !==0) {
+                operand1 = result;
+            }
             operator = "";
             operand2 = "";
         } 
@@ -122,15 +137,16 @@ function calculate() {
     const equalKey = document.querySelector("#equal-key");
     equalKey.addEventListener('click', (e) => {
         if(operand1 !== "" && operand2 !== "" && operator !== "") {
-            operand1 = operate(Number(operand1), Number(operand2), operator);
-            updateDisplay(operand1);
+            operate(Number(operand1), Number(operand2), operator);
+            if(result !==0) {
+                operand1 = result;
+            }
             operator = "";
             operand2 = "";
         }
 
         else {
-            displayError("ERROR, please provide both operands");
-            return "ERROR, please provide proper input";
+            displayError("ERROR, wrong inputs! clear and try again");
         }
     });
 }
