@@ -6,7 +6,8 @@ let result = 0;
 let isError = false;
 
 //DOM element for calculator display
-const display = document.querySelector('div.display');
+const display = document.querySelector('p#ongoing-display');
+const history = document.querySelector('p#history');
 
 //nodelist for all keys
 const keys = document.querySelectorAll('button.keys');
@@ -15,6 +16,11 @@ const keys = document.querySelectorAll('button.keys');
 //function to update display
 const updateDisplay = function (content) {
     display.textContent = content;
+}
+
+//function to update history
+const updateHistory = function (content) {
+    history.textContent = content;
 }
 
 //function to reset data variables
@@ -38,6 +44,7 @@ const clearDisplay = function() {
     display.classList.remove("error");
     reset();    
     display.textContent = "0";
+    history.textContent = "0";
     if(isError === true) {
         keys.forEach(button => button.removeAttribute('disabled'));
     }
@@ -67,7 +74,7 @@ function operate(a,b,operator) {
     //check if a and b are numbers
 
     if(typeof(a) !== 'number' && typeof(b) !== "number") {
-         displayError("ERROR, not a valid number, clear and try again!");
+         displayError("Not a valid number, clear and try again!");
     } 
 
     //call the appropriate function based on operator chosen by user
@@ -87,7 +94,7 @@ function operate(a,b,operator) {
         case "\u00F7":
             result = divide(a,b);
             if(result === 0) {
-                displayError("ERROR, cannot divide by 0, clear and try again!");
+                displayError("Cannot divide by 0, clear and try again!");
             }
             else updateDisplay(result);
             break;
@@ -124,6 +131,11 @@ function calculate() {
     operatorKeys.forEach( key => key.addEventListener( 'click',(e) => {
         if (operand1 !== "" && operand2 !== "" && operator !== "") {
             operate(Number(operand1), Number(operand2), operator);
+
+            //display operands or history
+            updateHistory(operand1 + " " + operator + " " + operand2);
+
+            //result being 0 indicates an error thrown
             if(result !==0) {
                 operand1 = result;
             }
@@ -131,6 +143,7 @@ function calculate() {
             operand2 = "";
         } 
         operator = e.target.textContent;
+        updateHistory(operand1 + " " + operator);
     }));
 
     //event listener on equal to key
@@ -138,6 +151,11 @@ function calculate() {
     equalKey.addEventListener('click', (e) => {
         if(operand1 !== "" && operand2 !== "" && operator !== "") {
             operate(Number(operand1), Number(operand2), operator);
+
+            //display operands or history
+            updateHistory(operand1 + " " + operator + " " + operand2 + " =");
+
+            //result being 0 indicates an error thrown
             if(result !==0) {
                 operand1 = result;
             }
@@ -146,7 +164,7 @@ function calculate() {
         }
 
         else {
-            displayError("ERROR, wrong inputs! clear and try again");
+            displayError("Wrong inputs! clear and try again");
         }
     });
 }
