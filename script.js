@@ -119,6 +119,187 @@ function operate(a,b,operator) {
     }
 }
 
+
+
+//handle operator key click
+const handleOperatorClick = (operatorValue) => {
+    if (operand1 !== "" && operand2 !== "" && operator !== "") {
+        operate(Number(operand1), Number(operand2), operator);
+
+        //display operands or history
+        updateHistory(operand1 + " " + operator + " " + operand2);
+
+        //result being 0 indicates an error thrown
+        if(result !==0) {
+            operand1 = result;
+        }
+        operator = "";
+        operand2 = "";
+    } 
+    operator = operatorValue;
+
+    //show first operand and current operator on a line above main display 
+    updateHistory(operand1 + " " + operator);
+
+    //enable decimal point when operator is clicked
+    decimalActive = false;
+    decimalKey.removeAttribute('disabled');
+}
+
+
+
+//handle input keys click
+const handleInputClick = (e) => {
+    if(operator !== "") {
+        operand2 += e.target.textContent;
+        updateDisplay(operand2);
+    } else {
+        if(operand1 === "0"){
+            operand1 = e.target.textContent;
+        } else {
+            operand1 += e.target.textContent;
+        }
+        updateDisplay(operand1);
+    }
+}
+
+
+//handle equal to key click
+const handleEqualToClick = () => {
+    if(operand1 !== "" && operand2 !== "" && operator !== "") {
+        operate(Number(operand1), Number(operand2), operator);
+
+        //display operands or history
+        updateHistory(operand1 + " " + operator + " " + operand2 + " =");
+
+        //result being 0 indicates an error thrown
+        if(result !==0) {
+            operand1 = result.toString();
+        }
+
+        //disable decimal point if answer has decimal key
+        if(operand1.includes(".")) {
+            decimalActive = true;
+            decimalKey.setAttribute('disabled', 'true');
+        }
+        operator = "";
+        operand2 = "";
+    } else {
+        displayError("Wrong inputs! clear and try again");
+    }
+}
+
+
+//handle backspace click
+const handleBackspaceClick = () => {
+    //for operand1
+    if(operator === "" && operand2 === "") {
+        //if operand1 has more than 1 digit, remove last digit
+        if(operand1.length > 1) {
+            operand1 = operand1.slice(0, -1);
+            updateDisplay(operand1);
+        } else {
+            operand1 = "0"
+            updateDisplay(operand1);
+        } 
+        //enable decimal point if it has been erased due to backspace
+        if(!operand1.includes(".")) {
+            decimalActive = false;
+            decimalKey.removeAttribute('disabled');
+        }
+    }
+
+    //for operand2
+    else if(operator !== "") {
+        if(operand2.length > 1) {
+            operand2 = operand2.slice(0, -1);
+            updateDisplay(operand2);
+        } else {
+            operand2 = "";
+            updateDisplay(operand2);
+        }
+        //enable decimal point if it has been erased due to backspace
+        if(!operand2.includes(".")) {
+            decimalActive = false;
+            decimalKey.removeAttribute('disabled');
+        }
+    }
+}
+
+
+//handle decimal point click
+const handleDecimalClick = () => {
+    if(operator === "" && operand2 === "") {
+        if(operand1.includes(".") === false) {
+            operand1 += ".";
+            updateDisplay(operand1);
+            decimalActive = true;
+            decimalKey.setAttribute('disabled', 'true');
+        }
+    }
+    else if(operator !== "") {
+        if(operand2.includes(".") === false) {
+            operand2 += ".";
+            updateDisplay(operand2);
+            decimalActive = true;
+            decimalKey.setAttribute('disabled', 'true');
+        }
+    }
+}
+
+
+
+
+//function to handle keyboard input
+const handleKeydown = function (e) {
+    //when number keys are pressed
+    if((e.keyCode > 95 && e.keyCode < 106) || (e.keyCode > 47 && e.keyCode < 58)) {
+        if(operator !== "") {
+            operand2 += e.key;
+            updateDisplay(operand2);
+        } else {
+            if(operand1 === "0"){
+                operand1 = e.key;
+            } else {
+                operand1 += e.key;
+            }
+            updateDisplay(operand1);
+        }
+    }
+
+    //when operator keys are pressed
+    else if(e.key === "+" || e.key === "-") {
+        handleOperatorClick(e.key);
+    }
+    
+    else if(e.key === "/") {
+        handleOperatorClick('\u00F7');
+    }
+    else if(e.key === "*") {
+        handleOperatorClick('x');
+    }
+
+    //when equal to key/enter key is pressed
+    else if(e.keyCode === 187) {
+        handleEqualToClick();
+    }
+
+    //when backspace is pressed
+    else if(e.keyCode === 8) {
+        handleBackspaceClick();
+    }
+
+    //when decimal point is pressed
+    else if(e.keyCode === 110 || e.keyCode === 190) {
+        handleDecimalClick();
+    }
+
+    else if(e.keyCode === 27) {
+        clearDisplay();
+    }
+}
+
+
 //main function
 function calculate() {
 
@@ -126,135 +307,23 @@ function calculate() {
     clearKey.addEventListener('click', clearDisplay);
 
     //event listener on number keys
-    inputKeys.forEach(key => key.addEventListener('click', (e) => {
-        if(operator !== "") {
-            operand2 += e.target.textContent;
-            updateDisplay(operand2);
-        } else {
-            if(operand1 === "0"){
-                operand1 = e.target.textContent;
-            } else {
-                operand1 += e.target.textContent;
-            }
-            updateDisplay(operand1);
-        }
-    }));
-
-
+    inputKeys.forEach(key => key.addEventListener('click', handleInputClick));
 
     //event listener on operator keys
-    operatorKeys.forEach( key => key.addEventListener( 'click',(e) => {
-        if (operand1 !== "" && operand2 !== "" && operator !== "") {
-            operate(Number(operand1), Number(operand2), operator);
-
-            //display operands or history
-            updateHistory(operand1 + " " + operator + " " + operand2);
-
-            //result being 0 indicates an error thrown
-            if(result !==0) {
-                operand1 = result;
-            }
-            operator = "";
-            operand2 = "";
-        } 
-        operator = e.target.textContent;
-        updateHistory(operand1 + " " + operator);
-
-        //enable decimal point when operator is clicked
-        decimalActive = false;
-        decimalKey.removeAttribute('disabled');
-    }));
-
-
+    operatorKeys.forEach( key => key.addEventListener( 'click', (e) => handleOperatorClick(operatorValue = e.target.textContent)));
 
     //event listener on equal to key
-    equalKey.addEventListener('click', (e) => {
-        if(operand1 !== "" && operand2 !== "" && operator !== "") {
-            operate(Number(operand1), Number(operand2), operator);
-
-            //display operands or history
-            updateHistory(operand1 + " " + operator + " " + operand2 + " =");
-
-            //result being 0 indicates an error thrown
-            if(result !==0) {
-                operand1 = result.toString();
-            }
-
-            //disable decimal point if answer has decimal key
-            if(operand1.includes(".")) {
-                decimalActive = true;
-                decimalKey.setAttribute('disabled', 'true');
-            }
-            operator = "";
-            operand2 = "";
-        } else {
-            displayError("Wrong inputs! clear and try again");
-        }
-    });
-
-
+    equalKey.addEventListener('click', handleEqualToClick);
 
     //event listener on backspace key
-    backspace.addEventListener('click', (e) => {
-        //for operand1
-        if(operator === "" && operand2 === "") {
-            //if operand1 has more than 1 digit, remove last digit
-            if(operand1.length > 1) {
-                operand1 = operand1.slice(0, -1);
-                updateDisplay(operand1);
-            } else {
-                operand1 = "0"
-                updateDisplay(operand1);
-            } 
-            //enable decimal point if it has been erased due to backspace
-            if(!operand1.includes(".")) {
-                decimalActive = false;
-                decimalKey.removeAttribute('disabled');
-            }
-        }
+    backspace.addEventListener('click', handleBackspaceClick);
 
-        //for operand2
-        else if(operator !== "") {
-            if(operand2.length > 1) {
-                operand2 = operand2.slice(0, -1);
-                updateDisplay(operand2);
-            } else {
-                operand2 = "";
-                updateDisplay(operand2);
-            }
-            //enable decimal point if it has been erased due to backspace
-            if(!operand2.includes(".")) {
-                decimalActive = false;
-                decimalKey.removeAttribute('disabled');
-            }
-        }     
-    });
+    //event listener on decimal point key, decimal point input functionality
+    decimalKey.addEventListener('click', handleDecimalClick);
 
-
-
-    //decimal point input functionality
-    decimalKey.addEventListener('click', (e) => {
-        if(operator === "" && operand2 === "") {
-            if(operand1.includes(".") === false) {
-                operand1 += ".";
-                updateDisplay(operand1);
-                decimalActive = true;
-                e.target.setAttribute('disabled', 'true');
-            }
-
-            console.log(operand1.includes("."));
-        }
-
-        else if(operator !== "") {
-            if(operand2.includes(".") === false) {
-                operand2 += ".";
-                updateDisplay(operand2);
-                decimalActive = true;
-                e.target.setAttribute('disabled', 'true');
-            }
-        }
-    });
-    }
+    //event listener on keypress or keydown, keyboard support
+    window.addEventListener('keydown', handleKeydown);
+}
 
     
 calculate();
